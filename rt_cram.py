@@ -9,6 +9,9 @@ from requests import request
 import requests
 import googlemaps
 
+from datetime import datetime
+
+
 class GoogleMapsClients(object):
     lat = None
     long = None
@@ -44,9 +47,9 @@ class GoogleMapsClients(object):
         try:
             latlng = r.json()['results'][0]['geometry']['location']
 
-            print(latlng)
+            #print(latlng)
         except:
-            print('something went wrong')
+            #print('something went wrong')
             pass
         lat, lng = latlng.get('lat'), latlng.get('lng')
         self.lat = lat
@@ -72,11 +75,36 @@ def search(self, keyword="Mexican Food", radius=5000, location=None):
         return {}
     return r.json()
 
+def get_time_analysis(url, private_key, business_name, area_or_road):
+
+    params = {
+    'api_key_private': private_key,
+    'venue_name': business_name,
+    'venue_address': area_or_road
+    }
+    response = requests.request("POST", url, params=params)
+    
+    res = response.json()
+
+    return res
+
 
 GOOGLE_API_KEY = open('API_KEY.txt').read()
-print(GOOGLE_API_KEY)
+private_key = open('private_key.txt').read()
+
 client = GoogleMapsClients(api_key=GOOGLE_API_KEY, address_or_zip='92660')
 
-print(client.lat, client.long)
+url_time = "https://besttime.app/api/v1f/orecasts"
 
-print(client.extract_lat_long())
+dest = input("Enter Name of the Place: ")
+area = input("Enter Area: ")
+
+today = datetime.today().isoweekday()
+
+res =  get_time_analysis(url_time, private_key, dest, area)
+
+print(res)
+
+
+print('Best Destination address is: %s' % dest_address)
+print('Best time to get there are: %s' % best_time)
